@@ -1,6 +1,11 @@
+.tic-tac-toe-board {
+  width: 400px;
+}
+
 .tic-tac-toe-square {
   width: 100px;
   height: 100px;
   background-color: aliceblue;
   margin: 10px;
+  display: inline-block;
 }
