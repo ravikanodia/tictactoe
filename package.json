@@ -1,0 +1,18 @@
+{
+  "name": "tictactoe",
+  "version": "0.0.1",
+  "description": "Multiplayer tic-tac-toe, with observers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ravi Kanodia",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "underscore": "^1.8.3",
+    "websocket": "^1.0.24",
+    "websocketserver": "^1.0.0"
+  }
+}

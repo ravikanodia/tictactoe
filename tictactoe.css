@@ -1,0 +1,6 @@
+.tic-tac-toe-square {
+  width: 100px;
+  height: 100px;
+  background-color: aliceblue;
+  margin: 10px;
+}
