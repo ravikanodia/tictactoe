@@ -1,56 +1,64 @@
+var _ = require("underscore");
 var WebSocketServer = require("websocketserver");
 var TicTacToe = require("./TicTacToe");
 
 var server = new WebSocketServer("all", 9000);
 
 var game = TicTacToe();
-
-var connectionList = [];
-var connections = {
-  players: Array(2).fill(null),
-  spectators: []
-};
+// connection index 0 and 1 are the players. Everyone else is spectating.
+var connections = [];
 
 function updateClients() {
   var msg = game.getState();
-  server.sendMessage("all", msg);
+  _.each(connections, connectionId =>
+    server.sendMessage(
+      "one",
+      JSON.stringify(annotateStateForClient(msg, connectionId)),
+      connectionId));
+}
+
+function annotateStateForClient(state, clientId) {
+  var clientState = _.clone(state);
+  clientState.clientIndex = connections.indexOf(clientId);
+  return clientState;
 }
 
 server.on("connection", id => {
-  if (connections.players.indexOf(null) != -1) {
-    connections.players[connections.players.indexOf(null)] = id;
-  } else {
-    connections.spectators.push(id);
-  }
-  console.log(`incoming connection id ${id}`);
+  var index = (connections.indexOf(null) == -1) ?
+    connections.length : connections.indexOf(null);
+  connections[index] = id;
+  console.log(`incoming connection id ${id} assigned to slot ${index}`);
 });
 
 server.on("message", (data, id) => {
   var mes = server.unmaskMessage(data);
   var str = server.convertToString(mes.message);
   console.log(str);
-  var playerIndex = connections.players.indexOf(id);
-  if (playerIndex == -1) {
-    console.log(`spectators such as connection ${id} are not allowed to play`);
+  var playerIndex = connections.indexOf(id);
+  if (!_.contains([0, 1], playerIndex)) {
+    console.log(`spectators such as connection ${id} in slot ${playerIndex} are not allowed to play`);
+    return;
   }
-  if (mes.id != id) {
-    console.log(`connection ${id} is trying to send a message with id ${id}`);
-  }
-  mes.player = playerIndex;
-  game.play(mes);
+  var action = JSON.parse(server.convertToString(mes.message));
+  action.player = playerIndex;
+  game.play(action);
+  console.log(mes);
+  console.log(data);
+  console.log(action);
   updateClients();
 });
 
 server.on("closedconnection", function(id) {
-  if (connections.players[0] == id) {
-    console.log(`Player one (connection id ${id}) has left`);
-    connections.players[0]= null;
-  } else if (connections.players[1] == id) {
-    console.log(`Player two (connection id ${id}) has left`);
-    connections.players[1] = null;
+  var index = connections.indexOf(id);
+  var usertype;
+  if (index == -1) {
+    usertype = "unknown";
+  } else if (_.contains([0, 1], index)) {
+    usertype = "player";
   } else {
-    console.log(`Spectator ${id} has left`);
-    connection.spectators =
-      _.filter(connection.spectators, spectatorId => spectatorId != id);
+    usertype == "spectator";
   }
+
+  console.log(`connection ${id} belonging to a ${usertype} in slot ${index} disconnected`);
+  connections[index] = null;
 });
