@@ -9,12 +9,20 @@ var game = TicTacToe();
 var connections = [];
 
 function updateClients() {
-  var msg = game.getState();
+ /* var msg = game.getState();
   _.each(connections, connectionId =>
     server.sendMessage(
       "one",
       JSON.stringify(annotateStateForClient(msg, connectionId)),
-      connectionId));
+      connectionId));*/
+  _.each(connections, connectionId => updateClient(connectionId));
+}
+
+function updateClient(connectionId) {
+  server.sendMessage(
+    "one",
+    JSON.stringify(annotateStateForClient(game.getState(), connectionId)),
+    connectionId);
 }
 
 function annotateStateForClient(state, clientId) {
@@ -28,6 +36,7 @@ server.on("connection", id => {
     connections.length : connections.indexOf(null);
   connections[index] = id;
   console.log(`incoming connection id ${id} assigned to slot ${index}`);
+  updateClient(id); 
 });
 
 server.on("message", (data, id) => {
