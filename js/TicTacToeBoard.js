@@ -32,13 +32,7 @@ class TicTacToeStatus extends React.Component {
         {
           className: 'tic-tac-toe-identity',
         },
-        this.props.identityMessage),
-      React.createElement(
-        'div',
-        {
-          className: 'tic-tac-toe-spectators',
-        },
-        this.props.spectatorsMessage)
+        this.props.identityMessage)
     );
   }
 }
@@ -53,15 +47,21 @@ class TicTacToeBoard extends React.Component {
   }
 
   getStateMessage() {
-    return "Next player: " + this.state.nextPlayerSymbol;
-  }
-
-  getSpectatorsMessage() {
-    return "No spectators";
+    if (this.state.winner !== null) {
+      return `Winner: ${this.state.winner}`;
+    } else {
+      return `Next to play: ${this.state.nextPlayerSymbol}`;
+    }
   }
 
   getIdentityMessage() {
-    return "You exist in the universe";
+    if (this.state.clientIndex == 0) {
+      return "You are X";
+    } else if (this.state.clientIndex == 1) {
+      return "You are O";
+    } else {
+      return "You are a spectator";
+    }
   }
 
   handleUpdate(update) {
@@ -76,7 +76,7 @@ class TicTacToeBoard extends React.Component {
   render() {
     this.props.socket.onmessage = event => {
       var gameData = JSON.parse(event.data);
-      console.log("board got message: gameData");
+      console.log(`board got message: ${JSON.stringify(gameData)}`);
       if (!gameData.hasOwnProperty('nextPlayer')) {
         console.log("skipping");
         return;
@@ -108,8 +108,7 @@ class TicTacToeBoard extends React.Component {
         TicTacToeStatus,
         {
           stateMessage: this.getStateMessage(),
-          identityMessage: this.getIdentityMessage(),
-          spectatorsMessage: this.getSpectatorsMessage()
+          identityMessage: this.getIdentityMessage()
         })
     );
   }
