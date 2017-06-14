@@ -16,3 +16,4 @@ Then open index.html in a browser. (You'll need to open two tabs to play a compl
 * Only one game can be played each time the server process is executed. You'll have to kill the server process and run it again to play a new game.
 * The client automatically connects to localhost:9000, meaning the players need to be on the same host as the server
 * could use a lot of visual polish
+* If you make local changes to the client, you'll need to run  <code>browserify js/client.js -o client.js</code>
