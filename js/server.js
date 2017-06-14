@@ -9,12 +9,6 @@ var game = TicTacToe();
 var connections = [];
 
 function updateClients() {
- /* var msg = game.getState();
-  _.each(connections, connectionId =>
-    server.sendMessage(
-      "one",
-      JSON.stringify(annotateStateForClient(msg, connectionId)),
-      connectionId));*/
   _.each(connections, connectionId => updateClient(connectionId));
 }
 
@@ -44,10 +38,6 @@ server.on("message", (data, id) => {
   var str = server.convertToString(mes.message);
   console.log(str);
   var playerIndex = connections.indexOf(id);
-  if (!_.contains([0, 1], playerIndex)) {
-    console.log(`spectators such as connection ${id} in slot ${playerIndex} are not allowed to play`);
-    return;
-  }
   var action = JSON.parse(server.convertToString(mes.message));
   action.player = playerIndex;
   game.play(action);
