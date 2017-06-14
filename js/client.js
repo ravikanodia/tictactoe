@@ -4,9 +4,19 @@ var TicTacToeBoard = require('./TicTacToeBoard');
 
 ws = new WebSocket('ws://localhost:9000');
 
-ReactDOM.render(React.createElement(TicTacToeBoard),
-  document.getElementById('tic-tac-toe'));
 ws.onmessage = data => {
   console.log(data)
 };
+
+ReactDOM.render(
+  React.createElement(
+    TicTacToeBoard,
+    {
+      play: (squareIndex) => {
+        console.log(`playing square ${squareIndex}`);
+        ws.send(JSON.stringify({square: squareIndex}));
+      }
+    }
+  ),
+  document.getElementById('tic-tac-toe'));
 

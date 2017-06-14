@@ -30,6 +30,12 @@ class TicTacToeStatus extends React.Component {
       React.createElement(
         'div',
         {
+          className: 'tic-tac-toe-identity',
+        },
+        this.props.identityMessage),
+      React.createElement(
+        'div',
+        {
           className: 'tic-tac-toe-spectators',
         },
         this.props.spectatorsMessage)
@@ -54,6 +60,10 @@ class TicTacToeBoard extends React.Component {
     return "No spectators";
   }
 
+  getIdentityMessage() {
+    return "You exist in the universe";
+  }
+
   render() {
     return React.createElement(
       'div',
@@ -71,7 +81,10 @@ class TicTacToeBoard extends React.Component {
               {
                 key: index,
                 value: this.state.squares[index],
-                onclick: () => console.log('click ' + index)
+                onclick: () => {
+                  console.log('click ' + index);
+                  this.props.play(index);
+                }
               }
             );
         })
@@ -80,6 +93,7 @@ class TicTacToeBoard extends React.Component {
         TicTacToeStatus,
         {
           stateMessage: this.getStateMessage(),
+          identityMessage: this.getIdentityMessage(),
           spectatorsMessage: this.getSpectatorsMessage()
         })
     );
