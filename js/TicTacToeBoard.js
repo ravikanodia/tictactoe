@@ -48,12 +48,12 @@ class TicTacToeBoard extends React.Component {
     super();
     this.state = {
       squares: Array(9).fill(null),
-      nextPlayer: 'X'
+      nextPlayerSymbol: 'X'
     };
   }
 
   getStateMessage() {
-    return "Next player: " + this.state.nextPlayer;
+    return "Next player: " + this.state.nextPlayerSymbol;
   }
 
   getSpectatorsMessage() {
@@ -64,7 +64,25 @@ class TicTacToeBoard extends React.Component {
     return "You exist in the universe";
   }
 
+  handleUpdate(update) {
+    this.setState(update);
+  }
+
+  play(squareIndex) {
+    console.log(`playing square ${squareIndex}`);
+    this.props.socket.send(JSON.stringify({square: squareIndex}));
+  }
+
   render() {
+    this.props.socket.onmessage = event => {
+      var gameData = JSON.parse(event.data);
+      console.log("board got message: gameData");
+      if (!gameData.hasOwnProperty('nextPlayer')) {
+        console.log("skipping");
+        return;
+      }
+      this.handleUpdate(gameData);
+    }
     return React.createElement(
       'div',
       {
@@ -77,16 +95,13 @@ class TicTacToeBoard extends React.Component {
         },
         _.map(this.state.squares, (value, index) => {
           return React.createElement(
-              TicTacToeSquare,
-              {
-                key: index,
-                value: this.state.squares[index],
-                onclick: () => {
-                  console.log('click ' + index);
-                  this.props.play(index);
-                }
-              }
-            );
+            TicTacToeSquare,
+            {
+              key: index,
+              value: this.state.squares[index],
+              onclick: () => { this.play(index); }
+            },
+          );
         })
       ),
       React.createElement(
